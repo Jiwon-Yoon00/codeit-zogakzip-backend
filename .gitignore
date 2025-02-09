@@ -1,5 +1,0 @@
-# Dependency directories
-node_modules/
-
-#보안관련해서..
-package-lock.json
