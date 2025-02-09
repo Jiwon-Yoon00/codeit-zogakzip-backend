@@ -1,11 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { addComment, getComments } = require('../controllers/commentController');
+const { addComment, getComments, updateComment} = require('../controllers/commentController');
 
 // 📌 1. 댓글 등록
 router.post('/', addComment);
 
 // 📌 4. 댓글 목록 조회 (페이지네이션)
 router.get('/', getComments);
+
+// 📌 댓글 수정 라우트 추가
+router.put('/:commentId', updateComment);  // PUT 요청을 통해 댓글 수정
+
 
 module.exports = router;

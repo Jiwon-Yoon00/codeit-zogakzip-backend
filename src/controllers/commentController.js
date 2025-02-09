@@ -69,5 +69,47 @@ const getComments = async (req, res) => {
     }
 };
 
+
+// 📌 댓글 수정
+const updateComment = async (req, res) => {
+    try {
+        const { commentId } = req.params; // URL에서 commentId 가져오기
+        const { nickname, content, password } = req.body; // 요청 본문에서 nickname, content, password 가져오기
+
+        // 요청 필드가 모두 존재하는지 확인
+        if (!nickname || !content || !password) {
+            return res.status(400).json({ message: "잘못된 요청입니다" });
+        }
+
+        // 댓글 찾기
+        const comment = await Comment.findByPk(commentId);
+        if (!comment) {
+            return res.status(404).json({ message: "존재하지 않습니다" });
+        }
+
+        // 비밀번호 확인
+        if (comment.password !== password) {
+            return res.status(403).json({ message: "비밀번호가 틀렸습니다" });
+        }
+
+        // 댓글 내용 수정
+        comment.nickname = nickname;
+        comment.content = content;
+        await comment.save();
+
+        // 수정된 댓글 반환
+        res.status(200).json({
+            id: comment.id,
+            nickname: comment.nickname,
+            content: comment.content,
+            createdAt: comment.createdAt
+        });
+    } catch (error) {
+        console.error("❌ 댓글 수정 오류:", error);
+        res.status(500).json({ message: "서버 오류 발생", error: error.message });
+    }
+};
+
+
 // ✅ 함수 내보내기
-module.exports = { addComment, getComments };
+module.exports = { addComment, getComments, updateComment };
