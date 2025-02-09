@@ -1,7 +1,5 @@
-
 # Dependency directories
 node_modules/
 
 #보안관련해서..
-package-lock.json".env" 
-".env"   # .gitignore에 추가 (이미 추가했다면 생략)
+package-lock.json
