@@ -1,0 +1,37 @@
+POST http://localhost:3000/api/groups
+Content-Type: application/json
+
+{
+  "name": "등산모임",
+  "password": "password123",
+  "imageUrl": "https://example.com/group1.jpg",
+  "isPublic": true,
+  "introduction": "산을 사랑하는 모임입니다."
+}
+
+### 
+GET http://localhost:3000/api/groups
+
+
+###
+PUT  http://localhost:3000/api/groups/{groupId}
+
+
+###
+DELETE http://localhost:3000/api/groups/{groupId}
+
+
+###
+GET http://localhost:3000/api/groups/{groupId}
+
+
+###
+POST http://localhost:3000/api/groups/{groupId}/verify-password
+
+
+###
+POST http://localhost:3000/api/groups/{groupId}/like
+
+
+###
+GET http://localhost:3000/api/groups/{groupId}/is-public
