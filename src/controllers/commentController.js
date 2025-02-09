@@ -110,6 +110,39 @@ const updateComment = async (req, res) => {
     }
 };
 
+// 📌 댓글 삭제
+const deleteComment = async (req, res) => {
+    try {
+        const { commentId } = req.params; // URL에서 commentId 가져오기
+        const { password } = req.body; // 요청 본문에서 password 가져오기
+
+        // 요청 필드가 모두 존재하는지 확인
+        if (!password) {
+            return res.status(400).json({ message: "잘못된 요청입니다" });
+        }
+
+        // 댓글 찾기
+        const comment = await Comment.findByPk(commentId);
+        if (!comment) {
+            return res.status(404).json({ message: "존재하지 않습니다" });
+        }
+
+        // 비밀번호 확인
+        if (comment.password !== password) {
+            return res.status(403).json({ message: "비밀번호가 틀렸습니다" });
+        }
+
+        // 댓글 삭제
+        await comment.destroy();
+
+        // 삭제된 후 성공 메시지 반환
+        res.status(200).json({ message: "답글 삭제 성공" });
+    } catch (error) {
+        console.error("❌ 댓글 삭제 오류:", error);
+        res.status(500).json({ message: "서버 오류 발생", error: error.message });
+    }
+};
+
 
 // ✅ 함수 내보내기
-module.exports = { addComment, getComments, updateComment };
+module.exports = { addComment, getComments, updateComment,deleteComment };

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addComment, getComments, updateComment} = require('../controllers/commentController');
+const { addComment, getComments, updateComment, deleteComment} = require('../controllers/commentController');
 
 // 📌 1. 댓글 등록
 router.post('/', addComment);
@@ -10,6 +10,9 @@ router.get('/', getComments);
 
 // 📌 댓글 수정 라우트 추가
 router.put('/:commentId', updateComment);  // PUT 요청을 통해 댓글 수정
+
+// 📌 댓글 삭제
+router.delete('/:commentId', deleteComment); // DELETE 요청을 통해 댓글 삭제
 
 
 module.exports = router;
