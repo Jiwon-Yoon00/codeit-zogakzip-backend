@@ -16,6 +16,10 @@ app.use(express.json());
 const groupRoutes = require('./src/routes/groupRoutes'); // ✅ routes 폴더에서 가져오기!
 app.use('/api/groups', groupRoutes);
 
+// 📌 댓글 관련 라우트 추가
+const commentRoutes = require('./src/routes/commentRoutes'); 
+app.use('/api/comments', commentRoutes);
+
 // 📌 기본 테스트용 라우트 (서버 정상 작동 여부 확인)
 app.get('/', (req, res) => {
     res.send('✅ 서버 실행 중!');
