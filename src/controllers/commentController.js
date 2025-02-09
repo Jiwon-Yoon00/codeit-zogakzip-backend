@@ -31,5 +31,43 @@ const addComment = async (req, res) => {
     }
 };
 
+// 📌 댓글 목록 조회
+const getComments = async (req, res) => {
+    try {
+        const { page = 1, pageSize = 10 } = req.query; // 페이지 번호와 페이지 크기 (쿼리 파라미터에서 가져오기)
+        const offset = (page - 1) * pageSize; // 시작 인덱스 계산
+        const limit = parseInt(pageSize); // 페이지 크기 설정
+
+        // 페이지네이션을 위한 댓글 조회
+        const comments = await Comment.findAll({
+            limit: limit,
+            offset: offset,
+            order: [['createdAt', 'DESC']], // 최신 댓글부터 조회
+        });
+
+        // 전체 댓글 수 조회
+        const totalItemCount = await Comment.count();
+
+        // 전체 페이지 수 계산
+        const totalPages = Math.ceil(totalItemCount / pageSize);
+
+        // 응답 데이터 반환
+        res.status(200).json({
+            currentPage: parseInt(page),
+            totalPages: totalPages,
+            totalItemCount: totalItemCount,
+            data: comments.map(comment => ({
+                id: comment.id,
+                nickname: comment.nickname,
+                content: comment.content,
+                createdAt: comment.createdAt
+            }))
+        });
+    } catch (error) {
+        console.error("❌ 댓글 목록 조회 오류:", error);
+        res.status(500).json({ message: "서버 오류 발생", error: error.message });
+    }
+};
+
 // ✅ 함수 내보내기
-module.exports = { addComment };
+module.exports = { addComment, getComments };
