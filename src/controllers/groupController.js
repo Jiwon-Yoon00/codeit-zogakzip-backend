@@ -81,5 +81,20 @@ groupController.delete('/api/groups/:groupId', async(req, res , next) => {
   }
 })
 
+// 그룹 상세 정보 조회하기
+groupController.get('/api/groups/:groupId', async(req, res, next) => {
+  try {
+    const { groupId } = req.params;
+    const { password } = req.query;
+
+    const detailGroupData = await groupService.getGroup(groupId,password);
+
+    return res.status(200).json(detailGroupData);
+  } catch (error) {
+    next(error)
+  }
+})
+
+
 
 export default groupController;

@@ -1,5 +1,6 @@
-import bcrypt from 'bcrypt';
+import bcrypt, { compare } from 'bcrypt';
 import groupRespository from "../respoistories/groupRespository.js"
+import e from 'express';
 
 async function hashingPassword(password){
   return bcrypt.hash(password,10);
@@ -63,6 +64,7 @@ async function updateGroup(password, groupData) {
   return filterSensitiveGroupData(updatedGroup);
 }
 
+// 그룹 삭제하기
 async function deleteGroup(groupId, password) {
   const existingGroup = await groupRespository.findPasswordById(groupId);
 
@@ -77,10 +79,30 @@ async function deleteGroup(groupId, password) {
   return { message: "그룹이 삭제되었습니다." };
 }
 
+// 그룹 상세 정보 조회
+async function getGroup(groupId, password) {
+  const existingGroup = await groupRespository.findById(groupId);
+
+  if(!existingGroup){
+    throw new Error("존재하지 않습니다");
+  }
+
+  if(!existingGroup.isPublic){
+    const isValid = await bcrypt.compare(password, existingGroup.password);
+    if (!isValid) {
+      return { message: "비밀번호가 틀렸습니다." };
+    }
+  }
+
+  return filterSensitiveGroupData(existingGroup);
+}
+
 
 export default{
   createGroup,
   getAllGroups,
   updateGroup,
   deleteGroup,
+  getGroup,
+  
 }

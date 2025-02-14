@@ -112,6 +112,26 @@ async function deleteGroup(id) {
   });
 }
 
+async function findGroupPosts(groupId) {
+  return await prisma.post.findMany({
+    where: { groupId: Number(groupId) },
+    select: {
+      id: true,
+      nickname: true,
+      title: true,
+      content: true,
+      imageUrl: true,
+      location: true,
+      moment: true,
+      isPublic: true,
+      likeCount: true,
+      commentCount: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" }, // ✅ 최신순 정렬
+  });
+}
+
 export default{
   findByName,
   findById,
@@ -120,4 +140,5 @@ export default{
   getAll,
   update,
   deleteGroup,
+  findGroupPosts,
 }
