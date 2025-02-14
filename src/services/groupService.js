@@ -36,7 +36,6 @@ async function filterSensitiveGroupData(group) {
 
 async function verifyPassword(inputPassword, savedPassword){
   const isValid = await bcrypt.compare(inputPassword, savedPassword);
-  console.log(isValid);
   return isValid;
 }
 
@@ -64,9 +63,24 @@ async function updateGroup(password, groupData) {
   return filterSensitiveGroupData(updatedGroup);
 }
 
+async function deleteGroup(groupId, password) {
+  const existingGroup = await groupRespository.findPasswordById(groupId);
+
+  if(!existingGroup){
+    throw new Error("존재하지 않습니다");
+  }
+  const isValid = await verifyPassword(password, existingGroup.password);
+  if(!isValid){
+    throw new Error("비밀번호가 틀렸습니다");
+  }
+  await groupRespository.deleteGroup(groupId);
+  return { message: "그룹이 삭제되었습니다." };
+}
+
 
 export default{
   createGroup,
   getAllGroups,
   updateGroup,
+  deleteGroup,
 }

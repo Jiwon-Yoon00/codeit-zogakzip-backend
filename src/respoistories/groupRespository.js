@@ -104,6 +104,14 @@ async function update(group) {
   });
 }
 
+async function deleteGroup(id) {
+  return await prisma.group.delete({
+    where: {
+      id: Number(id),
+    },
+  });
+}
+
 export default{
   findByName,
   findById,
@@ -111,4 +119,5 @@ export default{
   save,
   getAll,
   update,
+  deleteGroup,
 }
