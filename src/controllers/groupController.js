@@ -91,8 +91,28 @@ groupController.get('/api/groups/:groupId', async(req, res, next) => {
 
     return res.status(200).json(detailGroupData);
   } catch (error) {
+    if (error.message === "비밀번호가 틀렸습니다") {
+      return res.status(401).json({ message: "비밀번호가 틀렸습니다" });
+    }
     next(error)
   }
+})
+
+// 그룹 조회 권한 확인
+groupController.post('/api/groups/:groupId/verify-password', async (req,res, next) => {
+  try {
+    const { groupId } = req.params;
+    const { password } = req.body;
+
+    const response  = await groupService.verifyGroupAccess(groupId,password);
+
+    return res.status(200).json(response);
+  } catch (error) {
+    if (error.message === "비밀번호가 틀렸습니다") {
+      return res.status(401).json({ message: "비밀번호가 틀렸습니다" });
+    }
+    next(error)
+  }  
 })
 
 

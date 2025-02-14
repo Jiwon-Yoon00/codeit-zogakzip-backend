@@ -35,6 +35,7 @@ async function filterSensitiveGroupData(group) {
   return rest;
 }
 
+// 비밀번호 확인하기 
 async function verifyPassword(inputPassword, savedPassword){
   const isValid = await bcrypt.compare(inputPassword, savedPassword);
   return isValid;
@@ -71,10 +72,13 @@ async function deleteGroup(groupId, password) {
   if(!existingGroup){
     throw new Error("존재하지 않습니다");
   }
+
   const isValid = await verifyPassword(password, existingGroup.password);
+
   if(!isValid){
     throw new Error("비밀번호가 틀렸습니다");
   }
+
   await groupRespository.deleteGroup(groupId);
   return { message: "그룹이 삭제되었습니다." };
 }
@@ -88,13 +92,41 @@ async function getGroup(groupId, password) {
   }
 
   if(!existingGroup.isPublic){
-    const isValid = await bcrypt.compare(password, existingGroup.password);
+    const isValid = await verifyPassword(password, existingGroup.password);
+    
     if (!isValid) {
-      return { message: "비밀번호가 틀렸습니다." };
+      throw new Error("비밀번호가 틀렸습니다");
+    }
+  }
+  // post 상세 조회 추가하기
+  
+  const filteredGroup = await filterSensitiveGroupData(existingGroup);
+  filteredGroup.badges = await transformBadgeNames(existingGroup.badges);
+  console.log(filteredGroup.badges)
+  return filteredGroup;
+}
+
+async function verifyGroupAccess(groupId, password) {
+  const existingGroup = await groupRespository.findById(groupId);
+
+  if(!existingGroup){
+    throw new Error("존재하지 않습니다");
+  }
+
+  if(!existingGroup.isPublic){
+    const isValid = await verifyPassword(password, existingGroup.password);
+
+    if(!isValid){
+      throw new Error("비밀번호가 틀렸습니다");
     }
   }
 
-  return filterSensitiveGroupData(existingGroup);
+  return {message: "비밀번호가 확인되었습니다."};
+}
+
+
+async function transformBadgeNames(badges){
+  return badges.map((b) => b.badge.name);
 }
 
 
@@ -104,5 +136,5 @@ export default{
   updateGroup,
   deleteGroup,
   getGroup,
-  
+  verifyGroupAccess,
 }
