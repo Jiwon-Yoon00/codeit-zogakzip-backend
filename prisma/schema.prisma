@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Group {
+  id           Int      @id @default(autoincrement())
+  name         String
+  password     String
+  imageUrl     String?
+  isPublic     Boolean
+  introduction String?
+  likeCount    Int      @default(0)
+  postCount    Int      @default(0)
+  badgeCount   Int      @default(0)
+  createAt     DateTime @default(now())
+
+  badges      GroupBadge[]
+  likes       GroupLike[]
+  posts       Post[]
+}
+
+model Badge {
+  id       Int    @id @default(autoincrement())
+  name     String
+  imageUrl String
+
+  groupBadges    GroupBadge[]
+  badgeCriteria  BadgeCriteria?
+}
+
+model GroupBadge {
+  id      Int  @id @default(autoincrement())
+  groupId Int
+  badgeId Int
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+}
+
+model BadgeCriteria {
+  badgeId       Int    @id
+  standardType  String
+  standardValue Int
+
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+}
+
+model GroupLike {
+  id      Int @id @default(autoincrement())
+  groupId Int
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id           Int     @id @default(autoincrement())
+  groupId      Int
+  nickname     String
+  title        String
+  content      String
+  password     String
+  imageUrl     String?
+  location     String?
+  moment       DateTime?
+  isPublic     Boolean
+  likeCount    Int     @default(0)
+  commentCount Int     @default(0)
+  createdAt    DateTime @default(now())
+
+  group    Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  tags     Tag[]
+  likes    PostLike[]
+  comments Comment[]
+}
+
+model Tag {
+  id     Int    @id @default(autoincrement())
+  postId Int
+  tagName String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model PostLike {
+  id     Int @id @default(autoincrement())
+  postId Int
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        Int     @id @default(autoincrement())
+  postId    Int
+  nickname  String
+  content   String
+  password  String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
