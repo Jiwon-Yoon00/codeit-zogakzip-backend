@@ -1,18 +1,18 @@
-const express = require('express');
+import express from "express";
+import { addComment, getComments, updateComment, deleteComment } from "../controllers/commentController.js";
+
 const router = express.Router();
-const { addComment, getComments, updateComment, deleteComment} = require('../controllers/commentController');
 
 // 📌 1. 댓글 등록
-router.post('/', addComment);
+router.post("/:postId/comments", addComment);
 
 // 📌 4. 댓글 목록 조회 (페이지네이션)
-router.get('/', getComments);
+router.get("/:postId/comments", getComments);
 
-// 📌 댓글 수정 라우트 추가
-router.put('/:commentId', updateComment);  // PUT 요청을 통해 댓글 수정
+// 📌 3. 댓글 수정 & 삭제는 `/api/comments/:commentId` 경로로 따로 분리해야 함!
+export const commentEditRouter = express.Router();
+commentEditRouter.put("/:commentId", updateComment);
+commentEditRouter.delete("/:commentId", deleteComment);
 
-// 📌 댓글 삭제
-router.delete('/:commentId', deleteComment); // DELETE 요청을 통해 댓글 삭제
 
-
-module.exports = router;
+export default router; // ✅ ESM 방식으로 export
