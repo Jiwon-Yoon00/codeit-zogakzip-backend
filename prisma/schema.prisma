@@ -23,7 +23,7 @@ model Group {
   likeCount    Int      @default(0)
   postCount    Int      @default(0)
   badgeCount   Int      @default(0)
-  createAt     DateTime @default(now())
+  createdAt     DateTime @default(now())
 
   badges      GroupBadge[]
   likes       GroupLike[]
