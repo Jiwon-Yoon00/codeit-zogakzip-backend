@@ -11,6 +11,11 @@ export const createGroup = async(req, res, next)=> {
     const group = await groupService.createGroup(req.body);
     return res.status(201).json(group);
   }catch(error){
+
+    if(error.message === '이미 존재하는 이름입니다'){
+      return res.status(403).json({ message: '이미 존재하는 이름입니다' });
+    }
+
     next(error);
   }
 };
@@ -75,12 +80,15 @@ export const deleteGroup = async(req, res , next) => {
     const response = await groupService.deleteGroup(groupId, password);
     return res.status(200).json(response);
   } catch (error) {
+    
     if (error.message === "존재하지 않습니다") {
       return res.status(404).json({ message: "존재하지 않습니다" });
     }
+
     if(error.message === "비밀번호가 틀렸습니다"){
       return res.status(403).json({ message: "비밀번호가 틀렸습니다" });
     }
+
     next(error); // Express 에러 핸들러로 전달
   }
 };
@@ -89,20 +97,24 @@ export const deleteGroup = async(req, res , next) => {
 export const getDetailGroup = async(req, res, next) => {
   try {
     const { groupId } = req.params;
-    const { password } = req.query;
 
-    const detailGroupData = await groupService.getGroup(groupId,password);
+    const detailGroupData = await groupService.getGroup(groupId);
 
     return res.status(200).json(detailGroupData);
   } catch (error) {
-    if (error.message === "비밀번호가 틀렸습니다") {
-      return res.status(401).json({ message: "비밀번호가 틀렸습니다" });
+    
+    if (error.message === "잘못된 요청입니다") {
+      return res.status(401).json({ message: "잘못된 요청입니다" });
+    }
+
+    if (error.message === "존재하지 않습니다") {
+      return res.status(404).json({ message: "존재하지 않습니다" });
     }
     next(error)
   }
 };
 
-// 그룹 조회 권한 확인
+// 📌 그룹 조회 권한 확인
 export const verifyGroupAccess = async (req,res, next) => {
   try {
     const { groupId } = req.params;
@@ -112,10 +124,15 @@ export const verifyGroupAccess = async (req,res, next) => {
 
     return res.status(200).json(response);
   } catch (error) {
+    
     if (error.message === "비밀번호가 틀렸습니다") {
       return res.status(401).json({ message: "비밀번호가 틀렸습니다" });
     }
-    next(error)
+
+    if (error.message === "존재하지 않습니다") {
+      return res.status(401).json({ message: "존재하지 않습니다" });
+    }
+    next(error);
   }  
 };
 

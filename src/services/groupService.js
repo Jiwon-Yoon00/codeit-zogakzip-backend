@@ -10,10 +10,7 @@ async function hashingPassword(password){
 async function createGroup(group) {
   const existName = await groupRespository.findByName(group.name);
   if(existName){
-    const error = new Error('Name already exists');
-    error.code = 422;
-    error.data = {name: group.name};
-    throw error;
+    throw new Error("이미 존재하는 이름입니다");
   }
 
   const hashedPassword = await hashingPassword(group.password)
@@ -91,21 +88,14 @@ async function getGroup(groupId, password) {
     throw new Error("존재하지 않습니다");
   }
 
-  if(!existingGroup.isPublic){
-    const isValid = await verifyPassword(password, existingGroup.password);
-    
-    if (!isValid) {
-      throw new Error("비밀번호가 틀렸습니다");
-    }
-  }
   // post 상세 조회 추가하기
-  
+
   const filteredGroup = await filterSensitiveGroupData(existingGroup);
   filteredGroup.badges = await transformBadgeNames(existingGroup.badges);
-  console.log(filteredGroup.badges)
   return filteredGroup;
 }
 
+// 그룹 조회 권한 확인 함수
 async function verifyGroupAccess(groupId, password) {
   const existingGroup = await groupRespository.findById(groupId);
 
@@ -128,7 +118,6 @@ async function verifyGroupAccess(groupId, password) {
 async function transformBadgeNames(badges){
   return badges.map((b) => b.badge.name);
 }
-
 
 export default{
   createGroup,
