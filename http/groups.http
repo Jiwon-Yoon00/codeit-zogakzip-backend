@@ -30,8 +30,8 @@ POST http://localhost:3000/api/groups/{groupId}/verify-password
 
 
 ###
-POST http://localhost:3000/api/groups/{groupId}/like
+POST http://localhost:3000/api/groups/1/like
 
 
 ###
-GET http://localhost:3000/api/groups/{groupId}/is-public
+GET http://localhost:3000/api/groups/1/is-public

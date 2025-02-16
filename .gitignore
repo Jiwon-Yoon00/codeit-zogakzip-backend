@@ -1,8 +1,12 @@
-
 # Dependency directories
 node_modules/
 
+<<<<<<< HEAD
+# 보안관련해서..
+package-lock.json
+=======
 #보안관련해서..
 package-lock.json
 
 .env
+>>>>>>> main
