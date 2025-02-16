@@ -1,22 +1,24 @@
 import express from "express";
-import cors from "cors"; // CORS Ãß°¡
+import cors from "cors"; // CORS ì¶”ê°€
 import path from "path";
 import postRoutes from "./routes/postRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
+import 'dotenv/config';
+import groupController from './controllers/groupController.js';
 
 const app = express();
 app.use(express.json());
-app.use(cors()); // ¸ðµç µµ¸ÞÀÎ¿¡¼­ÀÇ ¿äÃ»À» Çã¿ë
+app.use(cors()); // ëª¨ë“  ë„ë©”ì¸ì—ì„œì˜ ìš”ì²­ì„ í—ˆìš©
 
-const PORT = 3000; // ? PORT´Â ÇÑ ¹ø¸¸ ¼±¾ð
+const PORT = 3000; // ? PORTëŠ” í•œ ë²ˆë§Œ ì„ ì–¸
 
 app.use("/api/posts", postRoutes);
 app.use("/api/image", imageRoutes);
 
-// Á¤Àû ÆÄÀÏ ¼­ºù (¾÷·ÎµåµÈ ÀÌ¹ÌÁö¿¡ Á¢±Ù °¡´ÉÇÏ°Ô ¼³Á¤)
+// ì •ì  íŒŒì¼ ì„œë¹™ (ì—…ë¡œë“œëœ ì´ë¯¸ì§€ì— ì ‘ê·¼ ê°€ëŠ¥í•˜ê²Œ ì„¤ì •)
 app.use("/uploads", express.static("uploads"));
 
-// ReactÀÇ ºôµåµÈ Á¤Àû ÆÄÀÏÀ» Á¦°ø
+// Reactì˜ ë¹Œë“œëœ ì •ì  íŒŒì¼ì„ ì œê³µ
 app.use(express.static(path.join(import.meta.url, "../Client/build")));
 
 app.get("*", (req, res) => {
@@ -24,5 +26,5 @@ app.get("*", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`? ¼­¹ö ½ÇÇà Áß: http://localhost:${PORT}`);
+  console.log(`? ì„œë²„ ì‹¤í–‰ ì¤‘: http://localhost:${PORT}`);
 });
