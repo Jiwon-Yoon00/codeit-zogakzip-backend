@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import groupController from './controllers/groupController.js';
+import '../src/services/badgeScheduler.js'
 
 const app = express();
 app.use(express.json());

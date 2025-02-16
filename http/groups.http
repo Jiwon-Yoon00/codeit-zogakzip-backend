@@ -22,8 +22,7 @@ DELETE http://localhost:3000/api/groups/{groupId}
 
 
 ###
-GET http://localhost:3000/api/groups/{groupId}
-
+GET http://localhost:3000/api/groups/18
 
 ###
 POST http://localhost:3000/api/groups/{groupId}/verify-password

@@ -45,6 +45,15 @@ async function save(group){
   });
 }
 
+// 모든 그룹의 아이디만 가져오는 함수
+async function getAllId(){
+  return await prisma.group.findMany({
+    select:{
+      id: true,
+    }
+  })
+}
+
 async function getAll({ page = 1, pageSize = 10, sortBy = 'latest', keyword = "", isPublic }) {
   const offset = (page-1)*pageSize;
   let orderBy;
@@ -120,6 +129,7 @@ export default{
   findPasswordById,
   save,
   getAll,
+  getAllId,
   update,
   deleteGroup,
 }
