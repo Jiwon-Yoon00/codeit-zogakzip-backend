@@ -1,4 +1,4 @@
-import prisma from '../config/prisma';
+import prisma from '../config/prisma.js';
 
 async function findByName(name){
   return await prisma.group.findFirst({
@@ -45,7 +45,22 @@ async function save(group){
   });
 }
 
-async function getAll({ page = 1, pageSize = 10, sortBy = 'latest', keyword = "", isPublic }) {
+// 모든 그룹의 아이디만 가져오는 함수
+async function getAllId(){
+  return await prisma.group.findMany({
+    select:{
+      id: true,
+    }
+  })
+}
+
+async function getAll({ page = 1, pageSize = 10, sortBy='latest', keyword="", isPublic }) {
+  
+  const isPublicBoolean = isPublic === "true" ? true : isPublic === "false" ? false : undefined;
+  
+  // `keyword` 값 디코딩 (한글 깨짐 방지)
+  const decodedKeyword = keyword ? decodeURIComponent(keyword) : "";
+  
   const offset = (page-1)*pageSize;
   let orderBy;
   switch (sortBy) {
@@ -63,23 +78,23 @@ async function getAll({ page = 1, pageSize = 10, sortBy = 'latest', keyword = ""
       break;
   }
   
-  const groups =  await prisma.group.findMany({
+  const groups = await prisma.group.findMany({
     where: {
-      name: { contains: keyword},
-      ...(isPublic !== undefined ? { isPublic } : {})
+      ...(decodedKeyword ? { name: { contains: decodedKeyword} } : {}),
+      ...(isPublicBoolean !== undefined ? { isPublic: isPublicBoolean } : {})
     },
     orderBy,
     take: parseInt(pageSize),
     skip: offset,
   });
 
-    // 전체 아이템 개수 조회 (페이지네이션을 위해 필요)
-    const totalItemCount = await prisma.group.count({
-      where: {
-        ...(keyword ? { name: { contains: keyword, mode: "insensitive" } } : {}),
-        ...(isPublic !== undefined ? { isPublic } : {})
-      }
-    });
+  // 전체 아이템 개수 조회 (페이지네이션을 위해 필요)
+  const totalItemCount = await prisma.group.count({
+    where: {
+      ...(decodedKeyword ? { name: { contains: decodedKeyword } } : {}),
+      ...(isPublicBoolean !== undefined ? { isPublic: isPublicBoolean } : {})
+    }
+  });
 
   return {
     currentPage: page,
@@ -120,6 +135,7 @@ export default{
   findPasswordById,
   save,
   getAll,
+  getAllId,
   update,
   deleteGroup,
 }

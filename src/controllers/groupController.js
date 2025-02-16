@@ -6,20 +6,25 @@ import groupService from '../services/groupService.js'
 const groupController = express.Router();
 
 // 그룹 등록하기
-groupController.post('/api/groups', async(req, res,next)=> {
+export const createGroup = async(req, res, next)=> {
   try{
     const group = await groupService.createGroup(req.body);
     return res.status(201).json(group);
   }catch(error){
+
+    if(error.message === '이미 존재하는 이름입니다'){
+      return res.status(403).json({ message: '이미 존재하는 이름입니다' });
+    }
+
     next(error);
   }
-});
+};
 
 
 // 그룹 목록 조회
-groupController.get('/api/groups', async(req, res, next) => {
+export const getAllGroup = async(req, res, next) => {
   try{
-  const { page = 1, pageSize = 10 , sortBy = 'latest', keyword= "", isPublic} = req.query;
+  const { page = 1, pageSize = 10 , sortBy , keyword , isPublic} = req.query;
   const groupData = await groupService.getAllGroups({
     page: parseInt(page),
     pageSize: parseInt(pageSize),
@@ -27,15 +32,17 @@ groupController.get('/api/groups', async(req, res, next) => {
     keyword: keyword,
     isPublic: isPublic,
   });
+
+  console.log(sortBy);
   return res.status(200).json(groupData);
   }
   catch(error){
     next(error);
   }
-})
+};
 
 // 그룹 수정하기
-groupController.put('/api/groups/:groupId', async(req, res , next) => {
+export const updateGroup = async(req, res , next) => {
   try {
     const { groupId } = req.params;
     const { password, ...groupData } = req.body;
@@ -57,10 +64,10 @@ groupController.put('/api/groups/:groupId', async(req, res , next) => {
     }
     next(error); // Express 에러 핸들러로 전달
   }
-})
+};
 
 // 그룹 삭제하기
-groupController.delete('/api/groups/:groupId', async(req, res , next) => {
+export const deleteGroup = async(req, res , next) => {
   try {
     const { groupId } = req.params;
     const { password } = req.body;
@@ -73,35 +80,42 @@ groupController.delete('/api/groups/:groupId', async(req, res , next) => {
     const response = await groupService.deleteGroup(groupId, password);
     return res.status(200).json(response);
   } catch (error) {
+    
     if (error.message === "존재하지 않습니다") {
       return res.status(404).json({ message: "존재하지 않습니다" });
     }
+
     if(error.message === "비밀번호가 틀렸습니다"){
       return res.status(403).json({ message: "비밀번호가 틀렸습니다" });
     }
+
     next(error); // Express 에러 핸들러로 전달
   }
-})
+};
 
 // 그룹 상세 정보 조회하기
-groupController.get('/api/groups/:groupId', async(req, res, next) => {
+export const getDetailGroup = async(req, res, next) => {
   try {
     const { groupId } = req.params;
-    const { password } = req.query;
 
-    const detailGroupData = await groupService.getGroup(groupId,password);
+    const detailGroupData = await groupService.getGroup(groupId);
 
     return res.status(200).json(detailGroupData);
   } catch (error) {
-    if (error.message === "비밀번호가 틀렸습니다") {
-      return res.status(401).json({ message: "비밀번호가 틀렸습니다" });
+    
+    if (error.message === "잘못된 요청입니다") {
+      return res.status(401).json({ message: "잘못된 요청입니다" });
+    }
+
+    if (error.message === "존재하지 않습니다") {
+      return res.status(404).json({ message: "존재하지 않습니다" });
     }
     next(error)
   }
-})
+};
 
-// 그룹 조회 권한 확인
-groupController.post('/api/groups/:groupId/verify-password', async (req,res, next) => {
+// 📌 그룹 조회 권한 확인
+export const verifyGroupAccess = async (req,res, next) => {
   try {
     const { groupId } = req.params;
     const { password } = req.body;
@@ -110,15 +124,20 @@ groupController.post('/api/groups/:groupId/verify-password', async (req,res, nex
 
     return res.status(200).json(response);
   } catch (error) {
+    
     if (error.message === "비밀번호가 틀렸습니다") {
       return res.status(401).json({ message: "비밀번호가 틀렸습니다" });
     }
-    next(error)
+
+    if (error.message === "존재하지 않습니다") {
+      return res.status(401).json({ message: "존재하지 않습니다" });
+    }
+    next(error);
   }  
-})
+};
 
 // 📌 그룹 공감하기 (좋아요 증가)
-groupController.post("/:groupId/like", async (req, res) => {
+export const likeGroup = async (req, res) => {
     try {
         const { groupId } = req.params;
         const numericGroupId = Number(groupId); // ✅ 문자열을 숫자로 변환
@@ -145,10 +164,10 @@ groupController.post("/:groupId/like", async (req, res) => {
         console.error("❌ 서버 오류 발생:", error);
         res.status(500).json({ message: "서버 오류 발생", error: error.message });
     }
-});
+};
 
 // 📌 그룹 공개 여부 확인 API
-groupController.get("/:groupId/is-public", async (req, res) => {
+export const isGroupPublic = async (req, res) => {
     try {
         const { groupId } = req.params;
         const group = await prisma.group.findUnique({
@@ -165,6 +184,6 @@ groupController.get("/:groupId/is-public", async (req, res) => {
         console.error("❌ 서버 오류 발생:", error);
         res.status(500).json({ message: "서버 오류 발생", error: error.message });
     }
-});
+};
 
 export default groupController;

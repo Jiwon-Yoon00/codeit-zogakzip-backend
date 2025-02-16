@@ -2,36 +2,68 @@ POST http://localhost:3000/api/groups
 Content-Type: application/json
 
 {
-  "name": "등산모임",
-  "password": "password123",
+  "name": "자동차모임",
+  "password": "0000",
   "imageUrl": "https://example.com/group1.jpg",
   "isPublic": true,
-  "introduction": "산을 사랑하는 모임입니다."
+  "introduction": "모임모임"
 }
 
-### 
-GET http://localhost:3000/api/groups
+### 그룹 조회하기 - 기본 최신순
+GET http://localhost:3000/api/groups?sortBy=latest
+
+### 그룹 조회하기 - 공감 순 
+GET http://localhost:3000/api/groups?sortBy=mostLiked
+
+
+### 그룹 조회하기 - 공개/비공개
+GET http://localhost:3000/api/groups?isPublic=false
+
+
+### 그룹 조회하기 - 키워드
+GET http://localhost:3000/api/groups?keyword=모임모임
+
+
+### 그룹 조회하기
+GET http://localhost:3000/api/groups?sortBy=mostBadge
+
+
+###  그룹 수정
+PUT  http://localhost:3000/api/groups/26
+Content-Type: application/json
+
+{
+	"name": "개발자짱짱맨모임",
+	"password": "0000",
+	"imageUrl": "string",
+	"isPublic": true,
+	"introduction": "대박대박"
+}
+
+### 그룹 삭제 
+DELETE http://localhost:3000/api/groups/27
+Content-Type: application/json
+
+{
+  "password": "0101"
+}
+
+### 그룹 상세 정보 조회
+GET http://localhost:3000/api/groups/30
+
+
+### 그룹 조회 권한 확인
+POST http://localhost:3000/api/groups/28/verify-password
+Content-Type: application/json
+
+{
+  "password": "0000"
+}
+
+
+### 그룹 공감하기
+POST http://localhost:3000/api/groups/30/like
 
 
 ###
-PUT  http://localhost:3000/api/groups/{groupId}
-
-
-###
-DELETE http://localhost:3000/api/groups/{groupId}
-
-
-###
-GET http://localhost:3000/api/groups/{groupId}
-
-
-###
-POST http://localhost:3000/api/groups/{groupId}/verify-password
-
-
-###
-POST http://localhost:3000/api/groups/1/like
-
-
-###
-GET http://localhost:3000/api/groups/1/is-public
+GET http://localhost:3000/api/groups/30/is-public
