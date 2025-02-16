@@ -1,7 +1,26 @@
 import express from "express";
-import { likeGroup, isGroupPublic } from "../controllers/groupController.js";
+import { createGroup, getAllGroup, updateGroup, 
+  deleteGroup, getDetailGroup, likeGroup, verifyGroupAccess, isGroupPublic } from "../controllers/groupController.js";
 
 const router = express.Router();
+
+
+router.post("", createGroup);
+
+
+router.get("", getAllGroup);
+
+
+router.put("/:groupId", updateGroup);
+
+
+router.delete("/:groupId", deleteGroup);
+
+
+router.get("/:groupId", getDetailGroup);
+
+
+router.post("/:groupId/verify-password",verifyGroupAccess);
 
 
 // 📌 그룹 공감하기 (좋아요 증가)

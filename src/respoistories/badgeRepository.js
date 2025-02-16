@@ -1,4 +1,4 @@
-import prisma from '../config/prisma';
+import prisma from '../config/prisma.js';
 
 // ✔️ 이미 가지고 있는 뱃지라면 건너뛰기
 // ✔️가지고 있지 않는 뱃지라면 조건에 충족되는 지 알아보기
