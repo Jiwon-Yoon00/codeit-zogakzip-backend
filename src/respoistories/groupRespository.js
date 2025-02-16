@@ -54,7 +54,13 @@ async function getAllId(){
   })
 }
 
-async function getAll({ page = 1, pageSize = 10, sortBy = 'latest', keyword = "", isPublic }) {
+async function getAll({ page = 1, pageSize = 10, sortBy='latest', keyword="", isPublic }) {
+  
+  const isPublicBoolean = isPublic === "true" ? true : isPublic === "false" ? false : undefined;
+  
+  // `keyword` 값 디코딩 (한글 깨짐 방지)
+  const decodedKeyword = keyword ? decodeURIComponent(keyword) : "";
+  
   const offset = (page-1)*pageSize;
   let orderBy;
   switch (sortBy) {
@@ -72,23 +78,23 @@ async function getAll({ page = 1, pageSize = 10, sortBy = 'latest', keyword = ""
       break;
   }
   
-  const groups =  await prisma.group.findMany({
+  const groups = await prisma.group.findMany({
     where: {
-      name: { contains: keyword},
-      ...(isPublic !== undefined ? { isPublic } : {})
+      ...(decodedKeyword ? { name: { contains: decodedKeyword} } : {}),
+      ...(isPublicBoolean !== undefined ? { isPublic: isPublicBoolean } : {})
     },
     orderBy,
     take: parseInt(pageSize),
     skip: offset,
   });
 
-    // 전체 아이템 개수 조회 (페이지네이션을 위해 필요)
-    const totalItemCount = await prisma.group.count({
-      where: {
-        ...(keyword ? { name: { contains: keyword, mode: "insensitive" } } : {}),
-        ...(isPublic !== undefined ? { isPublic } : {})
-      }
-    });
+  // 전체 아이템 개수 조회 (페이지네이션을 위해 필요)
+  const totalItemCount = await prisma.group.count({
+    where: {
+      ...(decodedKeyword ? { name: { contains: decodedKeyword } } : {}),
+      ...(isPublicBoolean !== undefined ? { isPublic: isPublicBoolean } : {})
+    }
+  });
 
   return {
     currentPage: page,

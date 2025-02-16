@@ -42,7 +42,7 @@ async function verifyPassword(inputPassword, savedPassword){
 }
 
 // 그룹 목록 조회하기
-async function getAllGroups({ page = 1, pageSize = 10, sortBy = 'latest', keyword = "", isPublic }) {
+async function getAllGroups({ page = 1, pageSize = 10, sortBy='latest', keyword, isPublic }) {
   const data = await groupRespository.getAll({ page, pageSize, sortBy, keyword, isPublic });
   return filterSensitiveGroupData(data);
 }

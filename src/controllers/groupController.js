@@ -19,7 +19,7 @@ export const createGroup = async(req, res, next)=> {
 // 그룹 목록 조회
 export const getAllGroup = async(req, res, next) => {
   try{
-  const { page = 1, pageSize = 10 , sortBy = 'latest', keyword= "", isPublic} = req.query;
+  const { page = 1, pageSize = 10 , sortBy , keyword , isPublic} = req.query;
   const groupData = await groupService.getAllGroups({
     page: parseInt(page),
     pageSize: parseInt(pageSize),
@@ -27,6 +27,8 @@ export const getAllGroup = async(req, res, next) => {
     keyword: keyword,
     isPublic: isPublic,
   });
+
+  console.log(sortBy);
   return res.status(200).json(groupData);
   }
   catch(error){
