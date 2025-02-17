@@ -27,7 +27,7 @@ app.use("/api/comments", commentEditRouter);
 app.use('/uploads', express.static('uploads'));
 
 // React의 빌드된 정적 파일을 제공
-app.use(express.static(path.join(process.cwd(), 'Client/build')));
+//app.use(express.static(path.join(process.cwd(), 'Client/build')));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(process.cwd(), 'Client/build', 'index.html'));
