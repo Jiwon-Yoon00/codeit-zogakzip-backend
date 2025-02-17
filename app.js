@@ -23,7 +23,7 @@ app.use(morgan("dev"));
 
 // ✅ MySQL 데이터베이스 직접 연결 (database.js 없이 설정)
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: "mysql",
+  dialect: "postgresql",
   logging: false,
 });
 
