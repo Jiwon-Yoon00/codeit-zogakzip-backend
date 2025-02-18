@@ -10,7 +10,10 @@ Content-Type: application/json
 	"postPassword": "1234",
 	"groupPassword": "12345",
 	"imageUrl": "string",
-	"tags": [ "string", "string" ],
+	"tags": [
+		{ "tagName": "string1" },
+		{ "tagName": "string2" }
+	],
 	"location": "string",
 	"moment": "2025-02-18",
 	"isPublic": true
