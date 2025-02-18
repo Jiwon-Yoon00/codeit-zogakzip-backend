@@ -1,5 +1,5 @@
 ###
-//°Ô½Ã±Û µî·Ï 
+//ê²Œì‹œê¸€ ë“±ë¡ 
 POST http://localhost:3000/api/groups/5/posts
 Content-Type: application/json
 
@@ -12,18 +12,18 @@ Content-Type: application/json
 	"imageUrl": "string",
 	"tags": [ "string", "string" ],
 	"location": "string",
-	"moment": "2024-02-21",
+	"moment": "2025-02-18",
 	"isPublic": true
 }
 
 ###
-//°Ô½Ã±Û ¸ñ·Ï Á¶È¸ 
+//ê²Œì‹œê¸€ ëª©ë¡ ì¡°íšŒ 
 
 GET http://localhost:3000/api/groups/5/posts
 
 
 ###
-//°Ô½Ã±Û ¼öÁ¤ 
+//ê²Œì‹œê¸€ ìˆ˜ì • 
 PUT http://localhost:3000/api/posts/1
 Content-Type: application/json
 
@@ -35,12 +35,12 @@ Content-Type: application/json
 	"imageUrl": "string",
 	"tags": ["string", "string"],
 	"location": "string",
-	"moment": "2024-02-21",
+	"moment": "2025-02-18",
 	"isPublic": true
 }
 
 ###
-//°Ô½Ã±Û »èÁ¦ 
+//ê²Œì‹œê¸€ ì‚­ì œ 
 DELETE http://localhost:3000/api/posts/1
 Content-Type: application/json
 
@@ -50,13 +50,13 @@ Content-Type: application/json
 }
 
 ###
-//°Ô½Ã±Û »ó¼¼Á¤º¸ Á¶È¸ 
+//ê²Œì‹œê¸€ ìƒì„¸ì •ë³´ ì¡°íšŒ 
 
 GET http://localhost:3000/api/posts/5
 
 
 ###
-//°Ô½Ã±Û Á¶È¸ ±ÇÈ¯ È®ÀÎ 
+//ê²Œì‹œê¸€ ì¡°íšŒ ê¶Œí™˜ í™•ì¸ 
 POST http://localhost:3000/api/posts/2/verify-password
 Content-Type: application/json
 
@@ -66,11 +66,11 @@ Content-Type: application/json
 
 
 ###
-//°Ô½Ã±Û °ø°¨
+//ê²Œì‹œê¸€ ê³µê°
 POST http://localhost:3000/api/posts/2/like
 
 
 ###
-//°Ô½Ã±Û °ø°³ ¿©ºÎ È®ÀÎ
+//ê²Œì‹œê¸€ ê³µê°œ ì—¬ë¶€ í™•ì¸
 
 GET http://localhost:3000/api/posts/2/is-public
