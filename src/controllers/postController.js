@@ -67,6 +67,12 @@ export const createPost = async (req, res) => {
                 tags: true, // tags 정보를 포함하여 반환
             },
         });
+
+        await prisma.group.update({
+            where: { id: parseInt(groupId) },
+            data: { postCount: { increment: 1 } },
+
+        });
    
         // 성공적으로 생성된 게시글 반환
         res.status(200).json(newPost);
@@ -192,10 +198,16 @@ export const updatePost = async (req, res) => {
                 title,
                 content,
                 imageUrl,
-                tags,
+                tags: {
+                    deleteMany: {}, // 기존 태그 삭제
+                    create: tags.map(tag => ({ tagName: tag })), // 새로운 태그 추가
+                },
                 location,
                 moment: new Date(moment),
                 isPublic,
+            },
+            include: {
+                tags: true, // 업데이트 후 포함된 태그 반환
             },
         });
 
