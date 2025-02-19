@@ -15,6 +15,10 @@ app.use(cors()); // 모든 도메인에서의 요청을 허용
 // 서버 실행
 const PORT = 3000;
 
+app.get("/", (req, res) => {
+  res.send("Server is running!");
+});
+
 // 라우트 추가
 app.use('/api/posts', postRoutes);
 app.use('/api/image', imageRoutes);
@@ -27,11 +31,11 @@ app.use("/api/comments", commentEditRouter);
 app.use('/uploads', express.static('uploads'));
 
 // React의 빌드된 정적 파일을 제공
-app.use(express.static(path.join(process.cwd(), 'Client/build')));
+//app.use(express.static(path.join(process.cwd(), 'Client/build')));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'Client/build', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(process.cwd(), 'Client/build', 'index.html'));
+// });
 
 app.listen(PORT, () => {
   console.log(`✅ 서버 실행 중: http://localhost:${PORT}`);
