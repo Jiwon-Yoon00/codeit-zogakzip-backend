@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
-// °Ô½Ã±Û µî·Ï 
+// ê²Œì‹œê¸€ ë“±ë¡ 
 export const createPost = async (req, res) => {
     const { groupId } = req.params;
     const {
@@ -19,32 +19,32 @@ export const createPost = async (req, res) => {
         isPublic
     } = req.body;
 
-    // ¿äÃ» º»¹® À¯È¿¼º °Ë»ç
+    // ìš”ì²­ ë³¸ë¬¸ ìœ íš¨ì„± ê²€ì‚¬
     if (!nickname || !title || !content || !postPassword || !groupPassword || !imageUrl || !moment) {
-        return res.status(400).json({ message: "Àß¸øµÈ ¿äÃ»ÀÔ´Ï´Ù" });
+        return res.status(400).json({ message: "ì˜ëª»ëœ ìš”ì²­ì…ë‹ˆë‹¤" });
     }
 
     try {
-        // ±×·ì Á¸Àç È®ÀÎ ¹× ºñ¹Ğ¹øÈ£ °ËÁõ
+        // ê·¸ë£¹ ì¡´ì¬ í™•ì¸ ë° ë¹„ë°€ë²ˆí˜¸ ê²€ì¦
         const group = await prisma.group.findUnique({
             where: { id: parseInt(groupId) },
         });
 
         if (!group) {
-            return res.status(404).json({ message: "±×·ìÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù" });
+            return res.status(404).json({ message: "ê·¸ë£¹ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤" });
         }
 
         const isGroupPasswordValid = await bcrypt.compare(groupPassword, group.password);
 
         if (!isGroupPasswordValid) {
-            return res.status(403).json({ message: "±×·ì ºñ¹Ğ¹øÈ£°¡ Æ²·È½À´Ï´Ù" });
+            return res.status(403).json({ message: "ê·¸ë£¹ ë¹„ë°€ë²ˆí˜¸ê°€ í‹€ë ¸ìŠµë‹ˆë‹¤" });
         }
 
-        // °Ô½Ã±Û ºñ¹Ğ¹øÈ£ ÇØ½Ì
+        // ê²Œì‹œê¸€ ë¹„ë°€ë²ˆí˜¸ í•´ì‹±
         const hashedPostPassword = await bcrypt.hash(postPassword, 10);
 
-        // °Ô½Ã±Û »ı¼º
-        const newPost = await prisma.post.create({
+        // ê²Œì‹œê¸€ ìƒì„±
+       const newPost = await prisma.post.create({
             data: {
                 groupId: parseInt(groupId),
                 nickname,
@@ -52,24 +52,31 @@ export const createPost = async (req, res) => {
                 content,
                 password: hashedPostPassword,
                 imageUrl,
-                tags: tags,  // ¹è¿­·Î ÀúÀå
+                tags: {
+                    create: tags.map((tag) => ({
+                        tagName: tag
+                    })),
+                },
                 location,
-                moment: new Date(moment),  // ¹®ÀÚ¿­ ³¯Â¥¸¦ Date °´Ã¼·Î º¯È¯
+                moment: new Date(moment), 
                 isPublic,
                 likeCount: 0,
                 commentCount: 0,
-            }
+            },
+            include: {
+                tags: true, // tags ì •ë³´ë¥¼ í¬í•¨í•˜ì—¬ ë°˜í™˜
+            },
         });
    
-        // ¼º°øÀûÀ¸·Î »ı¼ºµÈ °Ô½Ã±Û ¹İÈ¯
+        // ì„±ê³µì ìœ¼ë¡œ ìƒì„±ëœ ê²Œì‹œê¸€ ë°˜í™˜
         res.status(200).json(newPost);
     } catch (error) {
         console.error('Error creating post:', error);
-        res.status(500).json({ message: '¼­¹ö ¿À·ùÀÔ´Ï´Ù' });
+        res.status(500).json({ message: 'ì„œë²„ ì˜¤ë¥˜ì…ë‹ˆë‹¤' });
     }
 };
 
-// °Ô½Ã±Û ¸ñ·Ï Á¶È¸ 
+// ê²Œì‹œê¸€ ëª©ë¡ ì¡°íšŒ 
 export const getPosts = async (req, res) => {
     const { groupId } = req.params;
     const { page = 1, pageSize = 10, sortBy = 'latest', keyword = '', isPublic } = req.query;
@@ -109,7 +116,7 @@ export const getPosts = async (req, res) => {
                 orderBy,
                 skip: (pageNumber - 1) * pageSizeNumber,
                 take: pageSizeNumber,
-                select: {  // ¼±ÅÃÀûÀ¸·Î ÇÊµå¸¸ ¹İÈ¯
+                select: {  // ì„ íƒì ìœ¼ë¡œ í•„ë“œë§Œ ë°˜í™˜
                     id: true,
                     nickname: true,
                     title: true,
@@ -121,7 +128,7 @@ export const getPosts = async (req, res) => {
                     likeCount: true,
                     commentCount: true,
                     createdAt: true,
-                    // password ÇÊµå¸¦ Á¦¿ÜÇÕ´Ï´Ù.
+                    // password í•„ë“œë¥¼ ì œì™¸í•©ë‹ˆë‹¤.
                 },
             }),
         ]);
@@ -136,11 +143,11 @@ export const getPosts = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching posts:', error);
-        res.status(500).json({ message: '¼­¹ö ¿À·ùÀÔ´Ï´Ù' });
+        res.status(500).json({ message: 'ì„œë²„ ì˜¤ë¥˜ì…ë‹ˆë‹¤' });
     }
 };
 
-// °Ô½Ã±Û ¼öÁ¤ 
+// ê²Œì‹œê¸€ ìˆ˜ì • 
 export const updatePost = async (req, res) => {
     const { postId } = req.params;
     const {
@@ -155,29 +162,29 @@ export const updatePost = async (req, res) => {
         isPublic
     } = req.body;
 
-    // ¿äÃ» º»¹® À¯È¿¼º °Ë»ç
+    // ìš”ì²­ ë³¸ë¬¸ ìœ íš¨ì„± ê²€ì‚¬
     if (!nickname || !title || !content || !postPassword || !imageUrl || !moment) {
-        return res.status(400).json({ message: "Àß¸øµÈ ¿äÃ»ÀÔ´Ï´Ù" });
+        return res.status(400).json({ message: "ì˜ëª»ëœ ìš”ì²­ì…ë‹ˆë‹¤" });
     }
 
     try {
-        // °Ô½Ã±Û Á¸Àç È®ÀÎ
+        // ê²Œì‹œê¸€ ì¡´ì¬ í™•ì¸
         const post = await prisma.post.findUnique({
             where: { id: parseInt(postId) },
         });
 
         if (!post) {
-            return res.status(404).json({ message: "Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù" });
+            return res.status(404).json({ message: "ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤" });
         }
 
-        // ºñ¹Ğ¹øÈ£ °ËÁõ
+        // ë¹„ë°€ë²ˆí˜¸ ê²€ì¦
         const isPasswordValid = await bcrypt.compare(postPassword, post.password);
 
         if (!isPasswordValid) {
-            return res.status(403).json({ message: "ºñ¹Ğ¹øÈ£°¡ Æ²·È½À´Ï´Ù" });
+            return res.status(403).json({ message: "ë¹„ë°€ë²ˆí˜¸ê°€ í‹€ë ¸ìŠµë‹ˆë‹¤" });
         }
 
-        // °Ô½Ã±Û ¼öÁ¤
+        // ê²Œì‹œê¸€ ìˆ˜ì •
         const updatedPost = await prisma.post.update({
             where: { id: parseInt(postId) },
             data: {
@@ -195,63 +202,63 @@ export const updatePost = async (req, res) => {
         res.status(200).json(updatedPost);
     } catch (error) {
         console.error('Error updating post:', error);
-        res.status(500).json({ message: '¼­¹ö ¿À·ùÀÔ´Ï´Ù' });
+        res.status(500).json({ message: 'ì„œë²„ ì˜¤ë¥˜ì…ë‹ˆë‹¤' });
     }
 };
 
-// °Ô½Ã±Û »èÁ¦ 
+// ê²Œì‹œê¸€ ì‚­ì œ 
 export const deletePost = async (req, res) => {
     const { postId } = req.params;
     const { postPassword } = req.body;
 
-    // ¿äÃ» º»¹® À¯È¿¼º °Ë»ç
+    // ìš”ì²­ ë³¸ë¬¸ ìœ íš¨ì„± ê²€ì‚¬
     if (!postPassword) {
-        return res.status(400).json({ message: 'Àß¸øµÈ ¿äÃ»ÀÔ´Ï´Ù' });
+        return res.status(400).json({ message: 'ì˜ëª»ëœ ìš”ì²­ì…ë‹ˆë‹¤' });
     }
 
     try {
-        // °Ô½Ã±Û Á¸Àç È®ÀÎ
+        // ê²Œì‹œê¸€ ì¡´ì¬ í™•ì¸
         const post = await prisma.post.findUnique({
             where: { id: parseInt(postId) },
         });
 
         if (!post) {
-            return res.status(404).json({ message: "°Ô½Ã±ÛÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù" });
+            return res.status(404).json({ message: "ê²Œì‹œê¸€ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤" });
         }
 
-        // ºñ¹Ğ¹øÈ£ °ËÁõ
+        // ë¹„ë°€ë²ˆí˜¸ ê²€ì¦
         const isPasswordValid = await bcrypt.compare(postPassword, post.password);
 
         if (!isPasswordValid) {
-            return res.status(403).json({ message: "ºñ¹Ğ¹øÈ£°¡ Æ²·È½À´Ï´Ù" });
+            return res.status(403).json({ message: "ë¹„ë°€ë²ˆí˜¸ê°€ í‹€ë ¸ìŠµë‹ˆë‹¤" });
         }
 
-        // °Ô½Ã±Û »èÁ¦
+        // ê²Œì‹œê¸€ ì‚­ì œ
         await prisma.post.delete({
             where: { id: parseInt(postId) },
         });
 
-        res.status(200).json({ message: "°Ô½Ã±ÛÀÌ »èÁ¦µÇ¾ú½À´Ï´Ù" });
+        res.status(200).json({ message: "ê²Œì‹œê¸€ì´ ì‚­ì œë˜ì—ˆìŠµë‹ˆë‹¤" });
     } catch (error) {
         console.error('Error deleting post:', error);
-        res.status(500).json({ message: '¼­¹ö ¿À·ùÀÔ´Ï´Ù' });
+        res.status(500).json({ message: 'ì„œë²„ ì˜¤ë¥˜ì…ë‹ˆë‹¤' });
     }
 };
 
-//±×·ì »ó¼¼ Á¤º¸ Á¶È¸ 
+//ê·¸ë£¹ ìƒì„¸ ì •ë³´ ì¡°íšŒ 
 export const getPostDetails = async (req, res) => {
     const { postId } = req.params;
 
-    // ¿äÃ» º»¹® À¯È¿¼º °Ë»ç
+    // ìš”ì²­ ë³¸ë¬¸ ìœ íš¨ì„± ê²€ì‚¬
     if (!postId || isNaN(postId)) {
-        return res.status(400).json({ message: "Àß¸øµÈ ¿äÃ»ÀÔ´Ï´Ù" });
+        return res.status(400).json({ message: "ì˜ëª»ëœ ìš”ì²­ì…ë‹ˆë‹¤" });
     }
 
     try {
-        // °Ô½Ã±Û Á¸Àç È®ÀÎ ¹× »ó¼¼ Á¤º¸ Á¶È¸
+        // ê²Œì‹œê¸€ ì¡´ì¬ í™•ì¸ ë° ìƒì„¸ ì •ë³´ ì¡°íšŒ
         const post = await prisma.post.findUnique({
             where: { id: parseInt(postId) },
-            select: {  // select¸¦ »ç¿ëÇÏ¿© password ÇÊµå¸¦ Á¦¿Ü
+            select: {  // selectë¥¼ ì‚¬ìš©í•˜ì—¬ password í•„ë“œë¥¼ ì œì™¸
                 id: true,
                 groupId: true,
                 nickname: true,
@@ -265,32 +272,32 @@ export const getPostDetails = async (req, res) => {
                 likeCount: true,
                 commentCount: true,
                 createdAt: true,
-                // password ÇÊµå¸¦ ¸í½ÃÀûÀ¸·Î Á¦¿Ü
+                // password í•„ë“œë¥¼ ëª…ì‹œì ìœ¼ë¡œ ì œì™¸
             },
         });
 
         if (!post) {
-            return res.status(404).json({ message: "Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù" });
+            return res.status(404).json({ message: "ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤" });
         }
 
         res.status(200).json(post);
     } catch (error) {
         console.error('Error fetching post details:', error);
-        res.status(500).json({ message: '¼­¹ö ¿À·ùÀÔ´Ï´Ù' });
+        res.status(500).json({ message: 'ì„œë²„ ì˜¤ë¥˜ì…ë‹ˆë‹¤' });
     }
 };
 
-//°Ô½Ã±Û °ø°³ ¿©ºÎ È®ÀÎ 
+//ê²Œì‹œê¸€ ê³µê°œ ì—¬ë¶€ í™•ì¸ 
 export const getPostPublicStatus = async (req, res) => {
     const { postId } = req.params;
 
-    // ¿äÃ» º»¹® À¯È¿¼º °Ë»ç
+    // ìš”ì²­ ë³¸ë¬¸ ìœ íš¨ì„± ê²€ì‚¬
     if (!postId || isNaN(postId)) {
-        return res.status(400).json({ message: "Àß¸øµÈ ¿äÃ»ÀÔ´Ï´Ù" });
+        return res.status(400).json({ message: "ì˜ëª»ëœ ìš”ì²­ì…ë‹ˆë‹¤" });
     }
 
     try {
-        // °Ô½Ã±Û Á¸Àç È®ÀÎ ¹× °ø°³ ¿©ºÎ Á¶È¸
+        // ê²Œì‹œê¸€ ì¡´ì¬ í™•ì¸ ë° ê³µê°œ ì—¬ë¶€ ì¡°íšŒ
         const post = await prisma.post.findUnique({
             where: { id: parseInt(postId) },
             select: {
@@ -300,31 +307,31 @@ export const getPostPublicStatus = async (req, res) => {
         });
 
         if (!post) {
-            return res.status(404).json({ message: "Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù" });
+            return res.status(404).json({ message: "ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤" });
         }
 
         res.status(200).json(post);
     } catch (error) {
         console.error('Error fetching post public status:', error);
-        res.status(500).json({ message: '¼­¹ö ¿À·ùÀÔ´Ï´Ù' });
+        res.status(500).json({ message: 'ì„œë²„ ì˜¤ë¥˜ì…ë‹ˆë‹¤' });
     }
 };
 
-//°Ô½Ã±Û °ø°¨ÇÏ±â 
+//ê²Œì‹œê¸€ ê³µê°í•˜ê¸° 
 export const likePost = async (req, res) => {
     const { postId } = req.params;
 
     try {
-        // °Ô½Ã±Û Á¸Àç È®ÀÎ
+        // ê²Œì‹œê¸€ ì¡´ì¬ í™•ì¸
         const post = await prisma.post.findUnique({
             where: { id: parseInt(postId) },
         });
 
         if (!post) {
-            return res.status(404).json({ message: 'Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù' });
+            return res.status(404).json({ message: 'ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤' });
         }
 
-        // °Ô½Ã±Û °ø°¨ ¼ö Áõ°¡
+        // ê²Œì‹œê¸€ ê³µê° ìˆ˜ ì¦ê°€
         await prisma.post.update({
             where: { id: parseInt(postId) },
             data: {
@@ -333,43 +340,43 @@ export const likePost = async (req, res) => {
         });
 
 
-        res.status(200).json({ message: '°Ô½Ã±Û °ø°¨ÇÏ±â ¼º°ø' });
+        res.status(200).json({ message: 'ê²Œì‹œê¸€ ê³µê°í•˜ê¸° ì„±ê³µ' });
     } catch (error) {
         console.error('Error liking post:', error);
-        res.status(500).json({ message: '¼­¹ö ¿À·ùÀÔ´Ï´Ù' });
+        res.status(500).json({ message: 'ì„œë²„ ì˜¤ë¥˜ì…ë‹ˆë‹¤' });
     }
 };
 
-//°Ô½Ã±Û Á¶È¸ ±ÇÈ¯ È®ÀÎ 
+//ê²Œì‹œê¸€ ì¡°íšŒ ê¶Œí™˜ í™•ì¸ 
 export const verifyPostPassword = async (req, res) => {
     const { postId } = req.params;
     const { password } = req.body;
 
-    // ¿äÃ» º»¹® À¯È¿¼º °Ë»ç
+    // ìš”ì²­ ë³¸ë¬¸ ìœ íš¨ì„± ê²€ì‚¬
     if (!password) {
-        return res.status(400).json({ message: 'ºñ¹Ğ¹øÈ£¸¦ Á¦°øÇØ ÁÖ¼¼¿ä' });
+        return res.status(400).json({ message: 'ë¹„ë°€ë²ˆí˜¸ë¥¼ ì œê³µí•´ ì£¼ì„¸ìš”' });
     }
 
     try {
-        // °Ô½Ã±Û Á¸Àç È®ÀÎ
+        // ê²Œì‹œê¸€ ì¡´ì¬ í™•ì¸
         const post = await prisma.post.findUnique({
             where: { id: parseInt(postId) },
         });
 
         if (!post) {
-            return res.status(404).json({ message: 'Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù' });
+            return res.status(404).json({ message: 'ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤' });
         }
 
-        // ºñ¹Ğ¹øÈ£ °ËÁõ
+        // ë¹„ë°€ë²ˆí˜¸ ê²€ì¦
         const isPasswordValid = await bcrypt.compare(password, post.password);
 
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'ºñ¹Ğ¹øÈ£°¡ Æ²·È½À´Ï´Ù' });
+            return res.status(401).json({ message: 'ë¹„ë°€ë²ˆí˜¸ê°€ í‹€ë ¸ìŠµë‹ˆë‹¤' });
         }
 
-        res.status(200).json({ message: 'ºñ¹Ğ¹øÈ£°¡ È®ÀÎµÇ¾ú½À´Ï´Ù' });
+        res.status(200).json({ message: 'ë¹„ë°€ë²ˆí˜¸ê°€ í™•ì¸ë˜ì—ˆìŠµë‹ˆë‹¤' });
     } catch (error) {
         console.error('Error verifying post password:', error);
-        res.status(500).json({ message: '¼­¹ö ¿À·ùÀÔ´Ï´Ù' });
+        res.status(500).json({ message: 'ì„œë²„ ì˜¤ë¥˜ì…ë‹ˆë‹¤' });
     }
 };
