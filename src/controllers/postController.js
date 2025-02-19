@@ -71,6 +71,7 @@ export const createPost = async (req, res) => {
         await prisma.group.update({
             where: { id: parseInt(groupId) },
             data: { postCount: { increment: 1 } },
+
         });
    
         // 성공적으로 생성된 게시글 반환
