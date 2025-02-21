@@ -254,6 +254,12 @@ export const deletePost = async (req, res) => {
             where: { id: parseInt(postId) },
         });
 
+        // group 테이블의 postCount 감소
+        await prisma.group.update({
+            where: { id: post.groupId },
+            data: { postCount: { decrement: 1 } },
+        });
+
         res.status(200).json({ message: "게시글이 삭제되었습니다" });
     } catch (error) {
         console.error('Error deleting post:', error);
