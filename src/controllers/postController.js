@@ -13,11 +13,7 @@ export const createPost = async (req, res) => {
         postPassword,
         groupPassword,
         imageUrl,
-        tags: {
-                    create: tags.map((tag) => ({
-                        tagName: tag
-                    })),
-                },
+        tags,
         location,
         moment,
         isPublic
@@ -48,7 +44,7 @@ export const createPost = async (req, res) => {
         const hashedPostPassword = await bcrypt.hash(postPassword, 10);
 
         // 게시글 생성
-       const newPost = await prisma.post.create({
+        const newPost = await prisma.post.create({
             data: {
                 groupId: parseInt(groupId),
                 nickname,
@@ -57,25 +53,17 @@ export const createPost = async (req, res) => {
                 password: hashedPostPassword,
                 imageUrl,
                 tags: {
-                    create: tags.map((tag) => ({
-                        tagName: tag
-                    })),
-                },
+                    create: [
+                      { tagName: "string1" },
+                      { tagName: "string2" }
+                    ]
+                  },
                 location,
-                moment: new Date(moment), 
+                moment: new Date(moment),  // 문자열 날짜를 Date 객체로 변환
                 isPublic,
                 likeCount: 0,
                 commentCount: 0,
-            },
-            include: {
-                tags: true, // tags 정보를 포함하여 반환
-            },
-        });
-
-        await prisma.group.update({
-            where: { id: parseInt(groupId) },
-            data: { postCount: { increment: 1 } },
-
+            }
         });
    
         // 성공적으로 생성된 게시글 반환
@@ -202,16 +190,10 @@ export const updatePost = async (req, res) => {
                 title,
                 content,
                 imageUrl,
-                tags: {
-                    deleteMany: {}, // 기존 태그 삭제
-                    create: tags.map(tag => ({ tagName: tag })), // 새로운 태그 추가
-                },
+                tags,
                 location,
                 moment: new Date(moment),
                 isPublic,
-            },
-            include: {
-                tags: true, // 업데이트 후 포함된 태그 반환
             },
         });
 
