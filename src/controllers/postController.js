@@ -133,11 +133,17 @@ export const getPosts = async (req, res) => {
 
         const totalPages = Math.ceil(totalItemCount / pageSizeNumber);
 
+         // Map tags to only include tagName
+        const formattedPosts = posts.map(post => ({
+            ...post,
+            tags: post.tags.map(tag => tag.tagName)
+        }));
+
         res.status(200).json({
             currentPage: pageNumber,
             totalPages,
             totalItemCount,
-            data: posts,
+            data: formattedPosts,
         });
     } catch (error) {
         console.error('Error fetching posts:', error);
@@ -284,7 +290,12 @@ export const getPostDetails = async (req, res) => {
             return res.status(404).json({ message: "존재하지 않습니다" });
         }
 
-        res.status(200).json(post);
+        const formattedPost = {
+            ...post,
+            tags: post.tags.map(tag => tag.tagName)
+        };
+
+        res.status(200).json(formattedPost);
     } catch (error) {
         console.error('Error fetching post details:', error);
         res.status(500).json({ message: '서버 오류입니다' });
