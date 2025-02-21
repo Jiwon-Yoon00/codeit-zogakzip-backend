@@ -23,6 +23,16 @@ export const addComment = async (req, res) => {
             }
         });
 
+        // 댓글 등록 후, 해당 postId의 post 테이블의 commentCount 증가
+        await prisma.post.update({
+            where: { id: Number(postId) }, // `postId`와 `post.id`가 연결된 경우
+            data: {
+                commentCount: {
+                    increment: 1 // 🔥 commentCount + 1
+                }
+            }
+        });
+
         res.status(201).json(newComment);
     } catch (error) {
         console.error("❌ [ERROR] 댓글 등록 오류:", error);
@@ -133,6 +143,15 @@ export const deleteComment = async (req, res) => {
         // 댓글 삭제
         await prisma.comment.delete({
             where: { id: Number(commentId) }
+        });
+
+        await prisma.post.update({
+            where: { id: Number(comment.postId) },
+            data: {
+                commentCount: {
+                    decrement: 1 
+                }
+            }
         });
 
         res.status(200).json({ message: "댓글이 삭제되었습니다" });
