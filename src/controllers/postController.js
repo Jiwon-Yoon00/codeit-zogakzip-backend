@@ -13,7 +13,11 @@ export const createPost = async (req, res) => {
         postPassword,
         groupPassword,
         imageUrl,
-        tags,
+        tags: {
+                    create: tags.map((tag) => ({
+                        tagName: tag
+                    })),
+                },
         location,
         moment,
         isPublic
