@@ -53,11 +53,10 @@ export const createPost = async (req, res) => {
                 password: hashedPostPassword,
                 imageUrl,
                 tags: {
-                    create: [
-                      { tagName: "string1" },
-                      { tagName: "string2" }
-                    ]
-                  },
+                    create: tags.map((tag) => ({
+                        tagName: tag
+                    })),
+                },
                 location,
                 moment: new Date(moment),  // 문자열 날짜를 Date 객체로 변환
                 isPublic,
@@ -65,7 +64,17 @@ export const createPost = async (req, res) => {
                 commentCount: 0,
             }
         });
-   
+        // 그룹의 postCount 증가
+        await prisma.group.update({
+            where: { id: parseInt(groupId) },
+            data: {
+                postCount: {
+                    increment: 1
+                }
+            }
+        });
+        
+
         // 성공적으로 생성된 게시글 반환
         res.status(200).json(newPost);
     } catch (error) {
