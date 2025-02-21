@@ -23,3 +23,22 @@ export const storage = multer.diskStorage({
 });
 
 export const uploadImage = multer({ storage: storage, fileFilter: imageFileFilter }).single('image');
+
+// 이미지 업로드 컨트롤러
+export const uploadImageController = (req, res) => {
+    uploadImage(req, res, (err) => {
+        if (err) {
+            return res.status(400).json({ success: false, message: err.message });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No file uploaded." });
+        }
+
+        const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+        
+        res.status(200).json({
+            imageUrl: imageUrl
+        });
+    });
+};
