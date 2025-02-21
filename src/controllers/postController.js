@@ -184,6 +184,9 @@ export const updatePost = async (req, res) => {
         // 게시글 존재 확인
         const post = await prisma.post.findUnique({
             where: { id: parseInt(postId) },
+            include: {
+                tags: true   // 기존 태그 가져오기
+            }
         });
 
         if (!post) {
@@ -197,19 +200,43 @@ export const updatePost = async (req, res) => {
             return res.status(403).json({ message: "비밀번호가 틀렸습니다" });
         }
 
-        // 게시글 수정
-        const updatedPost = await prisma.post.update({
+        // 1. 기존 태그 삭제
+        await prisma.tag.deleteMany({
+            where: {
+                postId: parseInt(postId)
+            }
+        });
+
+        // 2. 게시글 업데이트 (tags 제외)
+        await prisma.post.update({
             where: { id: parseInt(postId) },
             data: {
                 nickname,
                 title,
                 content,
                 imageUrl,
-                tags,
                 location,
                 moment: new Date(moment),
                 isPublic,
             },
+        });
+
+        // 3. 새로운 태그 추가
+        if (tags && tags.length > 0) {
+            await prisma.tag.createMany({
+                data: tags.map((tag) => ({
+                    tagName: tag,
+                    postId: parseInt(postId)  // 관계 설정
+                }))
+            });
+        }
+
+        // 수정 후 게시글 반환
+        const updatedPost = await prisma.post.findUnique({
+            where: { id: parseInt(postId) },
+            include: {
+                tags: true  // 업데이트된 태그 포함
+            }
         });
 
         res.status(200).json(updatedPost);
