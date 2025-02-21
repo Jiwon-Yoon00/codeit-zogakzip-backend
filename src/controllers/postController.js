@@ -11,7 +11,7 @@ export const createPost = async (req, res) => {
         title,
         content,
         postPassword,
-        groupPassword,
+        //groupPassword,
         imageUrl,
         tags,
         location,
@@ -19,8 +19,12 @@ export const createPost = async (req, res) => {
         isPublic
     } = req.body;
 
-    // 요청 본문 유효성 검사
-    if (!nickname || !title || !content || !postPassword || !groupPassword || !imageUrl || !moment) {
+    // // 요청 본문 유효성 검사
+    // if (!nickname || !title || !content || !postPassword || !groupPassword || !imageUrl || !moment) {
+    //     return res.status(400).json({ message: "잘못된 요청입니다" });
+    // }
+
+    if (!nickname || !title || !content || !postPassword ||  !imageUrl || !moment) {
         return res.status(400).json({ message: "잘못된 요청입니다" });
     }
 
@@ -34,11 +38,11 @@ export const createPost = async (req, res) => {
             return res.status(404).json({ message: "그룹이 존재하지 않습니다" });
         }
 
-        const isGroupPasswordValid = await bcrypt.compare(groupPassword, group.password);
+        // const isGroupPasswordValid = await bcrypt.compare(groupPassword, group.password);
 
-        if (!isGroupPasswordValid) {
-            return res.status(403).json({ message: "그룹 비밀번호가 틀렸습니다" });
-        }
+        // if (!isGroupPasswordValid) {
+        //     return res.status(403).json({ message: "그룹 비밀번호가 틀렸습니다" });
+        // }
 
         // 게시글 비밀번호 해싱
         const hashedPostPassword = await bcrypt.hash(postPassword, 10);
