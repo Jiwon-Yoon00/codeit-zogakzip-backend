@@ -1,9 +1,9 @@
 import express from "express";
-import { uploadImage } from "../controllers/imageController.js"; // .js È®ÀåÀÚ Ãß°¡
+import { uploadImage } from "./src/controllers/imageController.js"; // .js í™•ì¥ì ì¶”ê°€
 
 const router = express.Router();
 
-// POST /api/image - ÀÌ¹ÌÁö ¾÷·Îµå
-router.post("/", uploadImage);
+// POST /api/image - ì´ë¯¸ì§€ ì—…ë¡œë“œ
+router.post("/uploads", uploadImage);
 
-export default router; // ? ESM ¹æ½ÄÀ¸·Î ³»º¸³»±â
+export default router; //
