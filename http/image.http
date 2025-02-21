@@ -1,9 +1,10 @@
-###
-//이미지 url 생성 
-POST http://localhost:3000/api/image
-Content-Type: "multipart/form-data"
+POST http://localhost:3000/api/image/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
-{
-	"image": "1"
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="example.jpg"
+Content-Type: image/jpeg
 
-}
+(binary data of the image here)
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
