@@ -1,6 +1,5 @@
 import express from "express";
-import { uploadImage } from "./src/controllers/imageController.js"; // .js 확장자 추가
-
+import { uploadImage } from "../controllers/imageController.js";
 const router = express.Router();
 
 // POST /api/image - 이미지 업로드
